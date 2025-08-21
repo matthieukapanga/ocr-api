@@ -7,25 +7,27 @@ import uvicorn
 import os
 import platform
 
+
 # Configure Tesseract path based on platform
 def configure_tesseract():
     system = platform.system().lower()
-    
+
     # Check for environment variable first (for Heroku/Docker)
-    if os.getenv('TESSERACT_CMD'):
-        pytesseract.pytesseract.tesseract_cmd = os.getenv('TESSERACT_CMD')
-    elif system == 'windows':
+    if os.getenv("TESSERACT_CMD"):
+        pytesseract.pytesseract.tesseract_cmd = os.getenv("TESSERACT_CMD")
+    elif system == "windows":
         # Common Windows paths
         windows_paths = [
             r"C:\Program Files\Tesseract-OCR\tesseract.exe",
-            r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe"
+            r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe",
         ]
         for path in windows_paths:
             if os.path.exists(path):
                 pytesseract.pytesseract.tesseract_cmd = path
                 break
     # Linux/Unix systems typically have tesseract in PATH
-    
+
+
 configure_tesseract()
 
 app = FastAPI(title="OCR API", version="1.0.0")
@@ -84,8 +86,3 @@ async def upload_file(file: UploadFile = File(...)):
 
     except Exception as e:
         return {"success": False, "error": f"File processing failed: {str(e)}"}
-
-
-if __name__ == "__main__":
-    port = int(os.getenv('PORT', 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
